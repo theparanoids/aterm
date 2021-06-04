@@ -4,18 +4,13 @@
 package appdialogs
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/theparanoids/aterm/cmd/aterm/config"
+	"github.com/theparanoids/aterm/errors"
 	"github.com/theparanoids/aterm/fancy"
 )
 
-var ErrCancelled = fmt.Errorf("Cancelled")
-var ErrAlreadyExists = fmt.Errorf("Already Exists")
-
 // ShowInvalidConfigurationMessage renders user-messaging when a validation error occurs.
-// To actually validate the config, see config.ValidateConfig/ValidateLoadedConfig
+// To actually validate the config, see config.ValidateServerConfig
 func ShowInvalidConfigurationMessage(validationErr error) {
 	if validationErr == nil {
 		return
@@ -38,20 +33,20 @@ func ShowInvalidConfigMessageNoHelp(validationErr error) bool {
 	hasAccessIssue := false
 
 	printline("I detected problems with this configuration:")
-	if errors.Is(validationErr, config.ErrAccessKeyNotSet) {
+	if errors.Is(validationErr, errors.ErrAccessKeyNotSet) {
 		printline(" * Access Key has not been set")
 		hasAccessIssue = true
 	}
-	if errors.Is(validationErr, config.ErrSecretKeyNotSet) {
+	if errors.Is(validationErr, errors.ErrSecretKeyNotSet) {
 		printline(" * Secret Key has not been set")
 		hasAccessIssue = true
 	}
-	if errors.Is(validationErr, config.ErrSecretKeyMalformed) {
+	if errors.Is(validationErr, errors.ErrSecretKeyMalformed) {
 		printline(" * Secret Key is invalid")
 		hasAccessIssue = true
 	}
-	if errors.Is(validationErr, config.ErrAPIURLUnparsable) {
-		printline(" * API URL is invalid")
+	if errors.Is(validationErr, errors.ErrAPIURLUnparsable) {
+		printline(" * Host path is invalid")
 	}
 	printline()
 
@@ -71,4 +66,10 @@ func ShowUnableToSaveConfigErrorMessage(err error) {
 	printline("I was unable to save the updated configuration data. I encountered this error:")
 	printline(" " + fancy.WithPizzazz(err.Error(), fancy.Red))
 	printline("Settings will be saved for this run, but will need to be reconfigured the next time you start.")
+}
+
+func ShowFirstRunErrorMessage(err error) {
+	printline("It looks like the startup process ran into some issues: ")
+	// TODO: list the errors
+	printline("Configuration details are saved for now, but may need to be re-done on a future run.")
 }
